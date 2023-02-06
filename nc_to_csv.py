@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """nc_to_csv.py:
-A sample command-line tool to convert 2D NetCDF data to CSV time series
+A sample command-line tool to convert 1D NetCDF data to CSV time series
 """
 
 __author__ = "Deniz Ural"
@@ -44,14 +44,24 @@ parser.add_argument(
 cmd_args = parser.parse_args()
 
 # Open the netCDF file
-# with nc4.Dataset(cmd_args.file, 'r') as nc_file:
 nc_file = nc4.Dataset(cmd_args.file, "r")
-latitudes = nc_file.variables["latitude"][:]
-longitudes = nc_file.variables["longitude"][:]
-u100 = nc_file.variables["u100"][:]
-v100 = nc_file.variables["v100"][:]
 
-time = nc_file.variables["time"]
-time = nc4.num2date(time, time.units, time.calendar)
+# get the coordinates
+lat = nc_file.variables["latitude"][:]
+lon = nc_file.variables["longitude"][:]
+
+# get the wind data at the fixed location
+u100 = nc_file.variables["u100"][:,0,0]
+v100 = nc_file.variables["v100"][:,0,0]
+
+# get dates
+dates = nc_file.variables["time"]
+dates = nc4.num2date(dates, dates.units, dates.calendar)
 
 nc_file.close()
+
+# Create a DataFrame with the extracted information
+data = {'date': dates, 'u100': u100, 'v100': v100}
+df = pd.DataFrame(data)
+
+
