@@ -42,3 +42,16 @@ parser.add_argument(
 
 # parse command line arguments
 cmd_args = parser.parse_args()
+
+# Open the netCDF file
+# with nc4.Dataset(cmd_args.file, 'r') as nc_file:
+nc_file = nc4.Dataset(cmd_args.file, "r")
+latitudes = nc_file.variables["latitude"][:]
+longitudes = nc_file.variables["longitude"][:]
+u100 = nc_file.variables["u100"][:]
+v100 = nc_file.variables["v100"][:]
+
+time = nc_file.variables["time"]
+time = nc4.num2date(time, time.units, time.calendar)
+
+nc_file.close()
